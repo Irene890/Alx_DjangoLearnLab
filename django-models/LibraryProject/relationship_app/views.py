@@ -16,22 +16,25 @@ class LibraryDetailView(DetailView):
 
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
 from .forms import RegisterForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib import messages
 
-# User registration view
+# Register view
 def register_view(request):
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('login')  # after successful registration
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful!")
+            return redirect('login')
     else:
-        form = RegisterForm()
+        form = UserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
 
 
-# User login view
+# Login view
 def login_view(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -41,13 +44,15 @@ def login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('/')  # redirect to home or any protected page
+                messages.success(request, f"Welcome back, {username}!")
+                return redirect('home')  # or any home page you define
     else:
         form = AuthenticationForm()
     return render(request, 'relationship_app/login.html', {'form': form})
 
 
-# User logout view
+# Logout view
 def logout_view(request):
     logout(request)
+    messages.info(request, "You have successfully logged out.")
     return render(request, 'relationship_app/logout.html')
