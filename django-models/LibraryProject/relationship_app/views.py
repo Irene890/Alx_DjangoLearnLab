@@ -19,6 +19,8 @@ from django.contrib.auth import login,authenticate,logout
 from .forms import RegisterForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
+
 
 # Register view
 def register_view(request):
