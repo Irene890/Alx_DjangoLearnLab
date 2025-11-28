@@ -24,3 +24,17 @@ These provide hooks for logging or extending business logic.
 
 ## Testing
 Use Postman or curl to test all endpoints and verify permissions.
+
+## Query Capabilities
+
+### Filtering
+Example:
+GET /books/?author=3
+
+### Searching
+Full-text search on title and author name:
+GET /books/?search=Rowling
+
+### Ordering
+Sort by title or publication year:
+GET /books/?ordering=-publication_year
