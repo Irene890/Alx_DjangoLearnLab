@@ -13,9 +13,32 @@ class PostListView(ListView):
     ordering = ['-published_date'] # Explicitly order by newest first
     paginate_by = 10 # Optional: Add pagination for larger blogs
 
-# You can also use a simple function-based view if preferred:
-# def home(request):
-#     context = {
-#         'posts': Post.objects.all()
-#     }
-#     return render(request, 'blog/index.html', context)
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from .forms import RegisterForm, ProfileForm
+from django.contrib import messages
+
+def register_view(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST, request.FILES or None)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # auto-login after register (optional)
+            messages.success(request, "Registration successful.")
+            return redirect("profile")
+    else:
+        form = RegisterForm()
+    return render(request, "blog/register.html", {"form": form})
+
+@login_required
+def profile_view(request):
+    if request.method == "POST":
+        pform = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if pform.is_valid():
+            pform.save()
+            messages.success(request, "Profile updated.")
+            return redirect("profile")
+    else:
+        pform = ProfileForm(instance=request.user.profile)
+    return render(request, "blog/profile.html", {"pform": pform})
